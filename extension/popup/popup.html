@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tab Collections - Quick Actions</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <header class="popup-header">
+      <h1>Quick Actions</h1>
+    </header>
+
+    <div class="current-tab-section">
+      <div class="current-tab-label">Current Tab:</div>
+      <div id="currentTabInfo" class="current-tab-info">
+        <img id="currentTabFavicon" src="" alt="" class="tab-favicon" />
+        <div class="tab-details">
+          <div id="currentTabTitle" class="tab-title">Loading...</div>
+          <div id="currentTabUrl" class="tab-url">-</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions-section">
+      <button id="saveSessionBtn" class="action-btn">
+        💾 Save Current Session
+      </button>
+    </div>
+
+    <div class="collections-section">
+      <div class="section-header">
+        <h2>Add to Collection</h2>
+        <button id="newCollectionBtn" class="icon-btn">+</button>
+      </div>
+      <div id="collectionsList" class="collections-list"></div>
+    </div>
+
+    <div class="footer">
+      <a href="../newtab/newtab.html" target="_blank" class="footer-link">Open Dashboard</a>
+    </div>
+  </div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

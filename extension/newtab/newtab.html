@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tab Collections</title>
+  <link rel="stylesheet" href="newtab.css">
+</head>
+<body>
+  <div class="layout">
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!--Header -->
+      <header class="header">
+        <div class="header-left">
+          <h1>Tab Collections</h1>
+        </div>
+        <div class="header-right">
+          <button id="importBtn" class="btn btn-secondary" title="Import collections">📥 Import</button>
+          <button id="exportBtn" class="btn btn-secondary" title="Export collections">📤 Export</button>
+          <button id="newCollectionBtn" class="btn btn-primary">+ New Collection</button>
+        </div>
+      </header>
+
+      <!-- Search Bar -->
+      <div class="search-container">
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="Search tabs... (Press / to focus or double Shift for quick search)"
+        />
+        <div id="searchResults" class="search-results hidden"></div>
+      </div>
+
+      <!-- Collections List (Vertical Stack) -->
+      <div id="collectionsList" class="collections-list"></div>
+
+      <!-- Sessions Section -->
+      <div class="sessions-section">
+        <div class="sessions-header">
+          <h2>Saved Sessions</h2>
+          <button id="saveSessionBtn" class="btn btn-secondary">💾 Save Current Session</button>
+        </div>
+        <div id="sessionsGrid" class="sessions-grid"></div>
+      </div>
+    </main>
+
+    <!-- Open Tabs Sidebar (Right) -->
+    <aside class="open-tabs-sidebar">
+      <div class="sidebar-header">
+        <h3>Open Tabs</h3>
+        <span id="openTabsCount" class="tab-count">0</span>
+      </div>
+      <div class="sidebar-filter">
+        <input
+          type="text"
+          id="sidebarFilterInput"
+          class="filter-input"
+          placeholder="Filter open tabs..."
+        />
+      </div>
+      <div id="openTabsList" class="open-tabs-list"></div>
+    </aside>
+  </div>
+
+  <!-- Modal for New Collection -->
+  <div id="newCollectionModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>New Collection</h2>
+      <input type="text" id="collectionNameInput" placeholder="Collection name" class="input-field" autofocus />
+      <textarea id="collectionDescInput" placeholder="Description (optional)" class="input-field"></textarea>
+      <div class="modal-actions">
+        <button id="cancelCollectionBtn" class="btn btn-secondary">Cancel</button>
+        <button id="createCollectionBtn" class="btn btn-primary">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Save Session -->
+  <div id="saveSessionModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Save Session</h2>
+      <input type="text" id="sessionNameInput" placeholder="Session name (optional)" class="input-field" />
+      <div class="modal-actions">
+        <button id="cancelSessionBtn" class="btn btn-secondary">Cancel</button>
+        <button id="confirmSessionBtn" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Import Options -->
+  <div id="importModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Import Data</h2>
+      <p style="margin-bottom: 15px; color: #6b7280; font-size: 14px;">Choose how to handle existing data:</p>
+      <div class="modal-actions" style="flex-direction: column; gap: 10px;">
+        <button id="importMergeBtn" class="btn btn-primary" style="width: 100%;">Merge with Existing</button>
+        <button id="importReplaceBtn" class="btn btn-danger" style="width: 100%;">Replace All Data</button>
+        <button id="cancelImportBtn" class="btn btn-secondary" style="width: 100%;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden file input for import -->
+  <input type="file" id="importFileInput" accept=".json,.txt" style="display: none;" />
+
+  <script type="module" src="newtab.js"></script>
+</body>
+</html>
