@@ -325,6 +325,47 @@ function setupCollectionDragAndDrop() {
       draggedType = null;
       draggedData = null;
     });
+
+    // Allow tab cells to be drop targets for reordering
+    cell.addEventListener('dragover', (e) => {
+      if (draggedType === 'collection-tab' && draggedElement !== cell) {
+        const targetCollectionId = cell.dataset.collectionId;
+        const draggedCollectionId = draggedData.collectionId;
+
+        // Only allow reordering within the same collection
+        if (targetCollectionId === draggedCollectionId) {
+          e.preventDefault();
+          cell.classList.add('drag-over');
+        }
+      }
+    });
+
+    cell.addEventListener('dragleave', (e) => {
+      if (!cell.contains(e.relatedTarget)) {
+        cell.classList.remove('drag-over');
+      }
+    });
+
+    cell.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      cell.classList.remove('drag-over');
+
+      if (draggedType === 'collection-tab') {
+        const targetCollectionId = cell.dataset.collectionId;
+        const targetTabIndex = parseInt(cell.dataset.tabIndex);
+
+        // Reorder within same collection
+        if (draggedData.collectionId === targetCollectionId) {
+          await Storage.reorderTabInCollection(
+            targetCollectionId,
+            draggedData.tabId,
+            targetTabIndex
+          );
+          await loadData();
+          renderCollections();
+        }
+      }
+    });
   });
 
   // Collection body as drop target (for tabs)
