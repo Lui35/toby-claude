@@ -104,6 +104,19 @@
     </div>
   </div>
 
+  <!-- Modal for Edit Tab -->
+  <div id="editTabModal" class="modal hidden">
+    <div class="modal-content">
+      <h2>Edit Tab</h2>
+      <input type="text" id="editTabTitleInput" placeholder="Tab title" class="input-field" />
+      <input type="text" id="editTabUrlInput" placeholder="Tab URL" class="input-field" />
+      <div class="modal-actions">
+        <button id="cancelEditTabBtn" class="btn btn-secondary">Cancel</button>
+        <button id="saveEditTabBtn" class="btn btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Hidden file input for import -->
   <input type="file" id="importFileInput" accept=".json,.txt" style="display: none;" />
 

@@ -592,12 +592,38 @@ body {
   font-weight: bold;
 }
 
-.tab-cell:hover .tab-cell-remove {
+.tab-cell-edit {
+  position: absolute;
+  top: 8px;
+  right: 35px;
+  background: rgba(129, 140, 248, 0.15);
+  color: var(--accent);
+  border: none;
+  border-radius: 6px;
+  width: 22px;
+  height: 22px;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: 0;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tab-cell:hover .tab-cell-remove,
+.tab-cell:hover .tab-cell-edit {
   opacity: 1;
 }
 
 .tab-cell-remove:hover {
   background: var(--danger);
+  color: white;
+  transform: scale(1.1);
+}
+
+.tab-cell-edit:hover {
+  background: var(--accent);
   color: white;
   transform: scale(1.1);
 }

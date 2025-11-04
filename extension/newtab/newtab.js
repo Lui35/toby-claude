@@ -56,6 +56,15 @@ const importMergeBtn = document.getElementById('importMergeBtn');
 const importReplaceBtn = document.getElementById('importReplaceBtn');
 const cancelImportBtn = document.getElementById('cancelImportBtn');
 
+const editTabModal = document.getElementById('editTabModal');
+const editTabTitleInput = document.getElementById('editTabTitleInput');
+const editTabUrlInput = document.getElementById('editTabUrlInput');
+const saveEditTabBtn = document.getElementById('saveEditTabBtn');
+const cancelEditTabBtn = document.getElementById('cancelEditTabBtn');
+
+// Edit tab state
+let currentEditingTabId = null;
+
 // Initialize
 async function init() {
   loadTheme();
@@ -159,6 +168,7 @@ function renderCollections() {
                  data-tab-id="${tab.id}"
                  data-tab-index="${tabIndex}">
               <button class="tab-cell-remove" data-collection-id="${collection.id}" data-tab-id="${tab.id}">×</button>
+              <button class="tab-cell-edit" data-tab-id="${tab.id}" title="Edit tab">✏️</button>
               <div class="tab-cell-header">
                 <img src="${tab.faviconUrl || tab.favicon}" class="tab-cell-favicon" alt="" />
                 <div class="tab-cell-title">${escapeHtml(tab.title)}</div>
@@ -276,10 +286,26 @@ function setupCollectionEventListeners() {
     });
   });
 
+  // Edit tab
+  document.querySelectorAll('.tab-cell-edit').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const tabId = btn.dataset.tabId;
+      const tab = tabItems[tabId];
+      if (tab) {
+        currentEditingTabId = tabId;
+        editTabTitleInput.value = tab.title || '';
+        editTabUrlInput.value = tab.url || '';
+        editTabModal.classList.remove('hidden');
+        editTabTitleInput.focus();
+      }
+    });
+  });
+
   // Open tab on click
   document.querySelectorAll('.tab-cell').forEach(cell => {
     cell.addEventListener('click', async (e) => {
-      if (!e.target.closest('.tab-cell-remove')) {
+      if (!e.target.closest('.tab-cell-remove') && !e.target.closest('.tab-cell-edit')) {
         const tabId = cell.dataset.tabId;
         const tab = tabItems[tabId];
         if (tab) {
@@ -341,16 +367,24 @@ function setupCollectionDragAndDrop() {
         }
       }
     });
+  });
 
-    card.addEventListener('drop', async (e) => {
-      if (draggedType === 'collection') {
-        e.preventDefault();
-        const newIndex = Array.from(collectionsList.children).indexOf(draggedElement);
-        await Storage.reorderCollection(draggedData.collectionId, newIndex);
-        await loadData();
-        renderCollections();
-      }
-    });
+  // Drop handler for entire collections list
+  collectionsList.addEventListener('drop', async (e) => {
+    if (draggedType === 'collection') {
+      e.preventDefault();
+      const newIndex = Array.from(collectionsList.children).indexOf(draggedElement);
+      console.log('Reordering collection to index:', newIndex);
+      await Storage.reorderCollection(draggedData.collectionId, newIndex);
+      await loadData();
+      renderCollections();
+    }
+  });
+
+  collectionsList.addEventListener('dragover', (e) => {
+    if (draggedType === 'collection') {
+      e.preventDefault();
+    }
   });
 
   // Tab cell drag
@@ -887,6 +921,35 @@ function setupEventListeners() {
     importModal.classList.add('hidden');
   });
 
+  // Edit tab modal
+  saveEditTabBtn.addEventListener('click', async () => {
+    const title = editTabTitleInput.value.trim();
+    const url = editTabUrlInput.value.trim();
+
+    if (!title || !url) {
+      alert('Please provide both title and URL');
+      return;
+    }
+
+    if (currentEditingTabId) {
+      await Storage.updateTabItem(currentEditingTabId, { title, url });
+      await loadData();
+      renderCollections();
+
+      editTabTitleInput.value = '';
+      editTabUrlInput.value = '';
+      currentEditingTabId = null;
+      editTabModal.classList.add('hidden');
+    }
+  });
+
+  cancelEditTabBtn.addEventListener('click', () => {
+    editTabTitleInput.value = '';
+    editTabUrlInput.value = '';
+    currentEditingTabId = null;
+    editTabModal.classList.add('hidden');
+  });
+
   // Enter key for modals
   collectionNameInput.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') createCollectionBtn.click();
@@ -896,8 +959,16 @@ function setupEventListeners() {
     if (e.key === 'Enter') confirmSessionBtn.click();
   });
 
+  editTabTitleInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') saveEditTabBtn.click();
+  });
+
+  editTabUrlInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') saveEditTabBtn.click();
+  });
+
   // Close modals on background click
-  [newCollectionModal, saveSessionModal, importModal].forEach(modal => {
+  [newCollectionModal, saveSessionModal, importModal, editTabModal].forEach(modal => {
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
         modal.classList.add('hidden');

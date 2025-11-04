@@ -232,6 +232,22 @@ export const Storage = {
   },
 
   /**
+   * Update a tab item
+   * @param {string} tabId
+   * @param {Object} updates - Object with title and/or url
+   */
+  async updateTabItem(tabId, updates) {
+    const tabItems = await this.getTabItems();
+    if (tabItems[tabId]) {
+      tabItems[tabId] = {
+        ...tabItems[tabId],
+        ...updates
+      };
+      await this.setTabItems(tabItems);
+    }
+  },
+
+  /**
    * Get tabs for a collection
    * @param {string} collectionId
    * @returns {Promise<Array>}
