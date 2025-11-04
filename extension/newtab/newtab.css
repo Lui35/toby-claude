@@ -23,6 +23,8 @@ body {
   overflow-y: auto;
   padding: 20px;
   padding-right: 10px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 /* Open Tabs Sidebar */
@@ -278,15 +280,16 @@ body {
 .collections-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   margin-bottom: 30px;
+  padding: 0 20px;
 }
 
 /* Collection Card (Full-width) */
 .collection-card {
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  padding: 20px;
+  border-radius: 10px;
+  padding: 14px 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: all 0.2s;
   border: 2px solid transparent;
@@ -306,7 +309,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   cursor: grab;
 }
 
@@ -322,7 +325,7 @@ body {
 }
 
 .collection-title {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 600;
   color: #111827;
   cursor: text;
@@ -330,7 +333,7 @@ body {
   margin: -4px -8px;
   border-radius: 6px;
   transition: background 0.2s;
-  min-width: 100px;
+  min-width: 80px;
 }
 
 .collection-title:hover {
@@ -343,7 +346,7 @@ body {
 }
 
 .collection-meta {
-  font-size: 13px;
+  font-size: 12px;
   color: #6b7280;
 }
 
@@ -357,11 +360,11 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 6px;
+  padding: 6px;
+  border-radius: 5px;
   color: #6b7280;
   transition: all 0.2s;
-  font-size: 16px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -375,8 +378,8 @@ body {
 /* Collection Body (Grid of Tab Cells) */
 .collection-body {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 8px;
   transition: max-height 0.3s ease;
 }
 
@@ -388,14 +391,14 @@ body {
 .tab-cell {
   background: #f9fafb;
   border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 12px;
+  border-radius: 6px;
+  padding: 8px 10px;
   cursor: pointer;
   transition: all 0.2s;
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .tab-cell:hover {
@@ -417,19 +420,19 @@ body {
 .tab-cell-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .tab-cell-favicon {
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
   flex-shrink: 0;
 }
 
 .tab-cell-title {
   flex: 1;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: #111827;
   white-space: nowrap;
@@ -439,15 +442,15 @@ body {
 
 .tab-cell-remove {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 6px;
+  right: 6px;
   background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
   border: none;
-  border-radius: 4px;
-  width: 24px;
-  height: 24px;
-  font-size: 14px;
+  border-radius: 3px;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.2s;
@@ -465,89 +468,13 @@ body {
 }
 
 .tab-cell-host {
-  font-size: 11px;
+  font-size: 10px;
   color: #9ca3af;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Sessions */
-.sessions-section {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  padding: 20px 24px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.sessions-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.sessions-header h2 {
-  font-size: 18px;
-  color: #111827;
-  font-weight: 600;
-}
-
-.sessions-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
-}
-
-.session-card {
-  background: #f9fafb;
-  border-radius: 8px;
-  padding: 16px;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: 2px solid transparent;
-}
-
-.session-card:hover {
-  border-color: #667eea;
-  background: white;
-}
-
-.session-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  margin-bottom: 8px;
-}
-
-.session-name {
-  font-weight: 600;
-  color: #111827;
-  margin-bottom: 4px;
-  font-size: 14px;
-}
-
-.session-meta {
-  font-size: 11px;
-  color: #6b7280;
-}
-
-.session-stats {
-  font-size: 12px;
-  color: #4b5563;
-  margin-bottom: 12px;
-}
-
-.session-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.session-actions .btn {
-  flex: 1;
-  font-size: 12px;
-  padding: 8px 12px;
-}
 
 /* Modal */
 .modal {

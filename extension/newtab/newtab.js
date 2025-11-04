@@ -23,7 +23,6 @@ let dropTarget = null;
 const searchInput = document.getElementById('searchInput');
 const searchResults = document.getElementById('searchResults');
 const collectionsList = document.getElementById('collectionsList');
-const sessionsGrid = document.getElementById('sessionsGrid');
 const newCollectionBtn = document.getElementById('newCollectionBtn');
 const saveSessionBtn = document.getElementById('saveSessionBtn');
 const exportBtn = document.getElementById('exportBtn');
@@ -78,7 +77,6 @@ async function loadOpenTabs() {
 // Render everything
 function render() {
   renderCollections();
-  renderSessions();
 }
 
 // Render collections (full-width vertical cards)
@@ -448,54 +446,6 @@ function setupSidebarDragAndDrop() {
   });
 }
 
-// Render sessions
-function renderSessions() {
-  if (sessions.length === 0) {
-    sessionsGrid.innerHTML = `
-      <div class="empty-state" style="grid-column: 1 / -1;">
-        <div class="empty-state-icon">💾</div>
-        <div class="empty-state-text">No saved sessions</div>
-        <div class="empty-state-subtext">Save your current browser session for later</div>
-      </div>
-    `;
-    return;
-  }
-
-  sessionsGrid.innerHTML = sessions.map(session => `
-    <div class="session-card">
-      <div class="session-header">
-        <div>
-          <div class="session-name">${escapeHtml(session.name)}</div>
-          <div class="session-meta">${formatDate(session.createdAt)}</div>
-        </div>
-        <button class="icon-btn delete-session" data-id="${session.id}">🗑️</button>
-      </div>
-      <div class="session-stats">
-        ${session.tabCount || 0} tabs · ${session.windowCount || 1} window${session.windowCount > 1 ? 's' : ''}
-      </div>
-      <div class="session-actions">
-        <button class="btn btn-primary restore-session" data-id="${session.id}">Restore</button>
-      </div>
-    </div>
-  `).join('');
-
-  document.querySelectorAll('.restore-session').forEach(btn => {
-    btn.addEventListener('click', () => {
-      chrome.runtime.sendMessage({ action: 'restoreSession', sessionId: btn.dataset.id });
-    });
-  });
-
-  document.querySelectorAll('.delete-session').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      if (confirm('Delete this session?')) {
-        await Storage.deleteSession(btn.dataset.id);
-        await loadData();
-        renderSessions();
-      }
-    });
-  });
-}
 
 // Search functionality
 function handleSearch() {
@@ -621,8 +571,7 @@ function setupEventListeners() {
   confirmSessionBtn.addEventListener('click', async () => {
     const name = sessionNameInput.value.trim();
     await chrome.runtime.sendMessage({ action: 'saveSession', name });
-    await loadData();
-    renderSessions();
+    alert('Session saved successfully!');
 
     sessionNameInput.value = '';
     saveSessionModal.classList.add('hidden');
