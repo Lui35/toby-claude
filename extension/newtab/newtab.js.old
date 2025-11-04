@@ -732,14 +732,23 @@ function navigateSearchResults(direction) {
 
 // Setup event listeners
 function setupEventListeners() {
-  // Theme toggle
-  themeToggle.addEventListener('click', toggleTheme);
+  console.log('=== setupEventListeners CALLED ===');
 
-  // Search
-  searchInput.addEventListener('input', () => {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(handleSearch, 200);
-  });
+  try {
+    console.log('Setting up theme toggle');
+    // Theme toggle
+    themeToggle.addEventListener('click', toggleTheme);
+
+    console.log('Setting up search input');
+    // Search
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(handleSearch, 200);
+    });
+    console.log('Search input setup complete');
+  } catch (error) {
+    console.error('Error in setupEventListeners:', error);
+  }
 
   // Sidebar filter
   sidebarFilterInput.addEventListener('input', renderOpenTabs);
@@ -916,39 +925,55 @@ function setupEventListeners() {
     }
   });
 
+  console.log('About to set up cancelImportBtn');
   cancelImportBtn.addEventListener('click', () => {
     pendingImportData = null;
     importModal.classList.add('hidden');
   });
 
+  console.log('Reached edit tab modal section');
   // Edit tab modal
-  saveEditTabBtn.addEventListener('click', async () => {
-    const title = editTabTitleInput.value.trim();
-    const url = editTabUrlInput.value.trim();
+  console.log('Setting up edit tab modal listeners');
+  console.log('saveEditTabBtn:', saveEditTabBtn);
+  console.log('cancelEditTabBtn:', cancelEditTabBtn);
 
-    if (!title || !url) {
-      alert('Please provide both title and URL');
-      return;
-    }
+  if (saveEditTabBtn && cancelEditTabBtn) {
+    saveEditTabBtn.addEventListener('click', async () => {
+      console.log('Save button clicked');
+      const title = editTabTitleInput.value.trim();
+      const url = editTabUrlInput.value.trim();
 
-    if (currentEditingTabId) {
-      await Storage.updateTabItem(currentEditingTabId, { title, url });
-      await loadData();
-      renderCollections();
+      console.log('Title:', title, 'URL:', url, 'TabId:', currentEditingTabId);
 
+      if (!title || !url) {
+        alert('Please provide both title and URL');
+        return;
+      }
+
+      if (currentEditingTabId) {
+        console.log('Updating tab item...');
+        await Storage.updateTabItem(currentEditingTabId, { title, url });
+        await loadData();
+        renderCollections();
+
+        editTabTitleInput.value = '';
+        editTabUrlInput.value = '';
+        currentEditingTabId = null;
+        editTabModal.classList.add('hidden');
+        console.log('Tab updated successfully');
+      }
+    });
+
+    cancelEditTabBtn.addEventListener('click', () => {
+      console.log('Cancel button clicked');
       editTabTitleInput.value = '';
       editTabUrlInput.value = '';
       currentEditingTabId = null;
       editTabModal.classList.add('hidden');
-    }
-  });
-
-  cancelEditTabBtn.addEventListener('click', () => {
-    editTabTitleInput.value = '';
-    editTabUrlInput.value = '';
-    currentEditingTabId = null;
-    editTabModal.classList.add('hidden');
-  });
+    });
+  } else {
+    console.error('Edit tab buttons not found in DOM!');
+  }
 
   // Enter key for modals
   collectionNameInput.addEventListener('keypress', (e) => {
