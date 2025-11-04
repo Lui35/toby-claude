@@ -1,46 +1,46 @@
-// DOM element references
+// DOM element references - using getters to ensure elements are accessed after DOM is loaded
 export const dom = {
   // Main elements
-  themeToggle: document.getElementById('themeToggle'),
-  searchInput: document.getElementById('searchInput'),
-  searchResults: document.getElementById('searchResults'),
-  collectionsList: document.getElementById('collectionsList'),
+  get themeToggle() { return document.getElementById('themeToggle'); },
+  get searchInput() { return document.getElementById('searchInput'); },
+  get searchResults() { return document.getElementById('searchResults'); },
+  get collectionsList() { return document.getElementById('collectionsList'); },
 
   // Buttons
-  newCollectionBtn: document.getElementById('newCollectionBtn'),
-  saveSessionBtn: document.getElementById('saveSessionBtn'),
-  exportBtn: document.getElementById('exportBtn'),
-  importBtn: document.getElementById('importBtn'),
-  importFileInput: document.getElementById('importFileInput'),
+  get newCollectionBtn() { return document.getElementById('newCollectionBtn'); },
+  get saveSessionBtn() { return document.getElementById('saveSessionBtn'); },
+  get exportBtn() { return document.getElementById('exportBtn'); },
+  get importBtn() { return document.getElementById('importBtn'); },
+  get importFileInput() { return document.getElementById('importFileInput'); },
 
   // Sidebar
-  openTabsList: document.getElementById('openTabsList'),
-  openTabsCount: document.getElementById('openTabsCount'),
-  sidebarFilterInput: document.getElementById('sidebarFilterInput'),
+  get openTabsList() { return document.getElementById('openTabsList'); },
+  get openTabsCount() { return document.getElementById('openTabsCount'); },
+  get sidebarFilterInput() { return document.getElementById('sidebarFilterInput'); },
 
   // New Collection Modal
-  newCollectionModal: document.getElementById('newCollectionModal'),
-  collectionNameInput: document.getElementById('collectionNameInput'),
-  collectionDescInput: document.getElementById('collectionDescInput'),
-  createCollectionBtn: document.getElementById('createCollectionBtn'),
-  cancelCollectionBtn: document.getElementById('cancelCollectionBtn'),
+  get newCollectionModal() { return document.getElementById('newCollectionModal'); },
+  get collectionNameInput() { return document.getElementById('collectionNameInput'); },
+  get collectionDescInput() { return document.getElementById('collectionDescInput'); },
+  get createCollectionBtn() { return document.getElementById('createCollectionBtn'); },
+  get cancelCollectionBtn() { return document.getElementById('cancelCollectionBtn'); },
 
   // Save Session Modal
-  saveSessionModal: document.getElementById('saveSessionModal'),
-  sessionNameInput: document.getElementById('sessionNameInput'),
-  confirmSessionBtn: document.getElementById('confirmSessionBtn'),
-  cancelSessionBtn: document.getElementById('cancelSessionBtn'),
+  get saveSessionModal() { return document.getElementById('saveSessionModal'); },
+  get sessionNameInput() { return document.getElementById('sessionNameInput'); },
+  get confirmSessionBtn() { return document.getElementById('confirmSessionBtn'); },
+  get cancelSessionBtn() { return document.getElementById('cancelSessionBtn'); },
 
   // Import Modal
-  importModal: document.getElementById('importModal'),
-  importMergeBtn: document.getElementById('importMergeBtn'),
-  importReplaceBtn: document.getElementById('importReplaceBtn'),
-  cancelImportBtn: document.getElementById('cancelImportBtn'),
+  get importModal() { return document.getElementById('importModal'); },
+  get importMergeBtn() { return document.getElementById('importMergeBtn'); },
+  get importReplaceBtn() { return document.getElementById('importReplaceBtn'); },
+  get cancelImportBtn() { return document.getElementById('cancelImportBtn'); },
 
   // Edit Tab Modal
-  editTabModal: document.getElementById('editTabModal'),
-  editTabTitleInput: document.getElementById('editTabTitleInput'),
-  editTabUrlInput: document.getElementById('editTabUrlInput'),
-  saveEditTabBtn: document.getElementById('saveEditTabBtn'),
-  cancelEditTabBtn: document.getElementById('cancelEditTabBtn')
+  get editTabModal() { return document.getElementById('editTabModal'); },
+  get editTabTitleInput() { return document.getElementById('editTabTitleInput'); },
+  get editTabUrlInput() { return document.getElementById('editTabUrlInput'); },
+  get saveEditTabBtn() { return document.getElementById('saveEditTabBtn'); },
+  get cancelEditTabBtn() { return document.getElementById('cancelEditTabBtn'); }
 };

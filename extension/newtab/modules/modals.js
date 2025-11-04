@@ -43,11 +43,13 @@ export function setupModalHandlers() {
     dom.newCollectionModal.classList.add('hidden');
   });
 
-  // Save Session Modal
-  dom.saveSessionBtn.addEventListener('click', () => {
-    dom.saveSessionModal.classList.remove('hidden');
-    dom.sessionNameInput.focus();
-  });
+  // Save Session Modal (guard if button not present)
+  if (dom.saveSessionBtn) {
+    dom.saveSessionBtn.addEventListener('click', () => {
+      dom.saveSessionModal.classList.remove('hidden');
+      dom.sessionNameInput.focus();
+    });
+  }
 
   dom.confirmSessionBtn.addEventListener('click', async () => {
     const name = dom.sessionNameInput.value.trim();
@@ -127,20 +129,49 @@ export function setupModalHandlers() {
     dom.importModal.classList.add('hidden');
   });
 
-  // Edit Tab Modal
+  // Edit Tab Modal - using a more robust approach
   console.log('Setting up edit tab modal handlers');
-  console.log('saveEditTabBtn:', dom.saveEditTabBtn);
-  console.log('cancelEditTabBtn:', dom.cancelEditTabBtn);
 
-  if (!dom.saveEditTabBtn || !dom.cancelEditTabBtn) {
-    console.error('Edit tab modal buttons not found!');
+  // Get elements directly to debug
+  const saveBtn = document.getElementById('saveEditTabBtn');
+  const cancelBtn = document.getElementById('cancelEditTabBtn');
+  const modal = document.getElementById('editTabModal');
+  const titleInput = document.getElementById('editTabTitleInput');
+  const urlInput = document.getElementById('editTabUrlInput');
+
+  console.log('Direct element check:', {
+    saveBtn,
+    cancelBtn,
+    modal,
+    titleInput,
+    urlInput
+  });
+
+  console.log('Via dom object:', {
+    saveEditTabBtn: dom.saveEditTabBtn,
+    cancelEditTabBtn: dom.cancelEditTabBtn,
+    editTabModal: dom.editTabModal
+  });
+
+  if (!saveBtn || !cancelBtn || !modal) {
+    console.error('Edit tab modal elements not found!', {
+      saveBtn,
+      cancelBtn,
+      modal
+    });
+    // Try again after a delay
+    setTimeout(() => {
+      console.log('Retrying modal setup...');
+      const retryBtn = document.getElementById('saveEditTabBtn');
+      console.log('Retry check:', retryBtn);
+    }, 1000);
     return;
   }
 
-  dom.saveEditTabBtn.addEventListener('click', async () => {
+  saveBtn.addEventListener('click', async () => {
     console.log('Save button clicked!');
-    const title = dom.editTabTitleInput.value.trim();
-    const url = dom.editTabUrlInput.value.trim();
+    const title = titleInput.value.trim();
+    const url = urlInput.value.trim();
 
     console.log('Title:', title, 'URL:', url, 'TabId:', state.currentEditingTabId);
 
@@ -155,20 +186,20 @@ export function setupModalHandlers() {
       await loadData();
       renderCollections();
 
-      dom.editTabTitleInput.value = '';
-      dom.editTabUrlInput.value = '';
+      titleInput.value = '';
+      urlInput.value = '';
       state.currentEditingTabId = null;
-      dom.editTabModal.classList.add('hidden');
+      modal.classList.add('hidden');
       console.log('Tab updated successfully');
     }
   });
 
-  dom.cancelEditTabBtn.addEventListener('click', () => {
+  cancelBtn.addEventListener('click', () => {
     console.log('Cancel button clicked!');
-    dom.editTabTitleInput.value = '';
-    dom.editTabUrlInput.value = '';
+    titleInput.value = '';
+    urlInput.value = '';
     state.currentEditingTabId = null;
-    dom.editTabModal.classList.add('hidden');
+    modal.classList.add('hidden');
   });
 
   // Enter key for modals
@@ -180,19 +211,19 @@ export function setupModalHandlers() {
     if (e.key === 'Enter') dom.confirmSessionBtn.click();
   });
 
-  dom.editTabTitleInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') dom.saveEditTabBtn.click();
+  titleInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') saveBtn.click();
   });
 
-  dom.editTabUrlInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') dom.saveEditTabBtn.click();
+  urlInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') saveBtn.click();
   });
 
   // Close modals on background click
-  [dom.newCollectionModal, dom.saveSessionModal, dom.importModal, dom.editTabModal].forEach(modal => {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.classList.add('hidden');
+  [dom.newCollectionModal, dom.saveSessionModal, dom.importModal, modal].forEach(modalEl => {
+    modalEl.addEventListener('click', (e) => {
+      if (e.target === modalEl) {
+        modalEl.classList.add('hidden');
       }
     });
   });

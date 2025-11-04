@@ -12,6 +12,7 @@ import { setupKeyboardHandlers } from './modules/keyboard.js';
 // Initialize application
 async function init() {
   console.log('Initializing Tab Collections app...');
+  console.log('DOM ready state:', document.readyState);
 
   // Load theme
   loadTheme();
@@ -28,6 +29,7 @@ async function init() {
   setupEventListeners();
 
   console.log('Tab Collections app initialized successfully');
+  console.log('Edit tab modal button check:', document.getElementById('saveEditTabBtn'));
 }
 
 function setupEventListeners() {
@@ -56,5 +58,10 @@ function setupEventListeners() {
   }, 3000);
 }
 
-// Start the application
-init();
+// Start the application when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  // DOM is already loaded
+  init();
+}
