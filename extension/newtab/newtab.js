@@ -234,9 +234,22 @@ function setupCollectionEventListeners() {
 
   // Open all
   document.querySelectorAll('.open-all-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       e.stopPropagation();
-      chrome.runtime.sendMessage({ action: 'openCollection', collectionId: btn.dataset.collectionId });
+      const collectionId = btn.dataset.collectionId;
+      const collection = collections.find(c => c.id === collectionId);
+      if (collection && collection.tabIds) {
+        for (const tabId of collection.tabIds) {
+          const tab = tabItems[tabId];
+          if (tab) {
+            try {
+              await chrome.tabs.create({ url: tab.url, active: false });
+            } catch (error) {
+              console.error('Error opening tab:', error);
+            }
+          }
+        }
+      }
     });
   });
 
@@ -265,12 +278,16 @@ function setupCollectionEventListeners() {
 
   // Open tab on click
   document.querySelectorAll('.tab-cell').forEach(cell => {
-    cell.addEventListener('click', (e) => {
+    cell.addEventListener('click', async (e) => {
       if (!e.target.closest('.tab-cell-remove')) {
         const tabId = cell.dataset.tabId;
         const tab = tabItems[tabId];
         if (tab) {
-          chrome.runtime.sendMessage({ action: 'openTab', url: tab.url });
+          try {
+            await chrome.tabs.create({ url: tab.url, active: true });
+          } catch (error) {
+            console.error('Error opening tab:', error);
+          }
         }
       }
     });
@@ -640,22 +657,26 @@ function renderSearchResults() {
 }
 
 // Open a search result by index
-function openSearchResult(index) {
+async function openSearchResult(index) {
   if (index < 0 || index >= searchResultsData.length) return;
 
   const result = searchResultsData[index];
 
-  // Open the tab
-  chrome.runtime.sendMessage({ action: 'openTab', url: result.url });
+  console.log('Opening search result:', result.url);
+
+  try {
+    // Open the tab directly
+    await chrome.tabs.create({ url: result.url, active: true });
+    console.log('Tab opened successfully');
+  } catch (error) {
+    console.error('Error opening tab:', error);
+  }
 
   // Close search
   searchInput.value = '';
   searchResults.classList.add('hidden');
   searchResultsData = [];
   selectedSearchIndex = -1;
-
-  // Scroll to and highlight the collection and tab
-  scrollToAndHighlight(result.collectionId, result.id);
 }
 
 // Navigate search results with arrow keys
@@ -723,6 +744,7 @@ function setupEventListeners() {
         navigateSearchResults('up');
       } else if (e.key === 'Enter' && selectedSearchIndex >= 0) {
         e.preventDefault();
+        console.log('Enter pressed, opening result at index:', selectedSearchIndex);
         openSearchResult(selectedSearchIndex);
       }
     }

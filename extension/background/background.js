@@ -123,8 +123,15 @@ async function getCurrentTab() {
  * @param {string} url
  */
 async function openTab(url) {
-  await chrome.tabs.create({ url });
-  return { success: true };
+  console.log('Background: Opening tab with URL:', url);
+  try {
+    const tab = await chrome.tabs.create({ url, active: true });
+    console.log('Background: Tab created:', tab.id);
+    return { success: true };
+  } catch (error) {
+    console.error('Background: Error opening tab:', error);
+    return { success: false, error: error.message };
+  }
 }
 
 /**
