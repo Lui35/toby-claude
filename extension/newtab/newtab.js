@@ -20,6 +20,7 @@ let draggedData = null;
 let dropTarget = null;
 
 // DOM Elements
+const themeToggle = document.getElementById('themeToggle');
 const searchInput = document.getElementById('searchInput');
 const searchResults = document.getElementById('searchResults');
 const collectionsList = document.getElementById('collectionsList');
@@ -53,11 +54,37 @@ const cancelImportBtn = document.getElementById('cancelImportBtn');
 
 // Initialize
 async function init() {
+  loadTheme();
   await loadData();
   await loadOpenTabs();
   render();
   renderOpenTabs();
   setupEventListeners();
+}
+
+// Theme management
+function loadTheme() {
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+    themeToggle.textContent = '☀️';
+  } else {
+    document.body.classList.remove('dark-mode');
+    themeToggle.textContent = '🌙';
+  }
+}
+
+function toggleTheme() {
+  const isDark = document.body.classList.contains('dark-mode');
+  if (isDark) {
+    document.body.classList.remove('dark-mode');
+    themeToggle.textContent = '🌙';
+    localStorage.setItem('theme', 'light');
+  } else {
+    document.body.classList.add('dark-mode');
+    themeToggle.textContent = '☀️';
+    localStorage.setItem('theme', 'dark');
+  }
 }
 
 // Load data from storage
@@ -489,6 +516,65 @@ function setupSidebarDragAndDrop() {
 
 
 // Search functionality
+// Scroll to and highlight a specific tab in a collection
+function scrollToAndHighlight(collectionId, tabId) {
+  // Find the collection card
+  const collectionCard = document.querySelector(`.collection-card[data-collection-id="${collectionId}"]`);
+
+  if (collectionCard) {
+    // Expand the collection if it's collapsed
+    const collection = collections.find(c => c.id === collectionId);
+    if (collection && collection.collapsed) {
+      toggleCollapse(collectionId);
+      // Wait for animation to complete
+      setTimeout(() => {
+        scrollAndHighlightElements(collectionCard, tabId);
+      }, 300);
+    } else {
+      scrollAndHighlightElements(collectionCard, tabId);
+    }
+  }
+}
+
+// Helper function to scroll and highlight elements
+function scrollAndHighlightElements(collectionCard, tabId) {
+  // Scroll collection to top with smooth animation
+  collectionCard.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  });
+
+  // Highlight the collection briefly
+  collectionCard.style.transition = 'box-shadow 0.3s ease';
+  collectionCard.style.boxShadow = '0 0 0 3px var(--accent), 0 8px 16px rgba(0,0,0,0.2)';
+
+  // Find and highlight the specific tab
+  if (tabId) {
+    setTimeout(() => {
+      const tabCell = collectionCard.querySelector(`.tab-cell[data-tab-id="${tabId}"]`);
+      if (tabCell) {
+        tabCell.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
+        tabCell.style.transform = 'scale(1.05)';
+        tabCell.style.boxShadow = '0 0 0 2px var(--accent), 0 4px 12px rgba(0,0,0,0.15)';
+
+        // Remove highlights after animation
+        setTimeout(() => {
+          tabCell.style.transform = '';
+          tabCell.style.boxShadow = '';
+        }, 1500);
+      }
+
+      // Remove collection highlight
+      collectionCard.style.boxShadow = '';
+    }, 400);
+  } else {
+    // Remove collection highlight if no specific tab
+    setTimeout(() => {
+      collectionCard.style.boxShadow = '';
+    }, 1500);
+  }
+}
+
 function handleSearch() {
   const query = searchInput.value.trim();
 
@@ -506,7 +592,10 @@ function handleSearch() {
   }
 
   searchResults.innerHTML = results.map(result => `
-    <div class="search-result-item" data-url="${escapeHtml(result.url)}">
+    <div class="search-result-item"
+         data-url="${escapeHtml(result.url)}"
+         data-collection-id="${result.collectionId}"
+         data-tab-id="${result.id}">
       <img src="${result.faviconUrl || result.favicon}" alt="" />
       <div class="search-result-content">
         <div class="search-result-title">${escapeHtml(result.title)}</div>
@@ -519,15 +608,28 @@ function handleSearch() {
 
   document.querySelectorAll('.search-result-item').forEach(el => {
     el.addEventListener('click', () => {
-      chrome.runtime.sendMessage({ action: 'openTab', url: el.dataset.url });
+      const collectionId = el.dataset.collectionId;
+      const tabId = el.dataset.tabId;
+      const url = el.dataset.url;
+
+      // Open the tab
+      chrome.runtime.sendMessage({ action: 'openTab', url: url });
+
+      // Close search
       searchInput.value = '';
       searchResults.classList.add('hidden');
+
+      // Scroll to and highlight the collection and tab
+      scrollToAndHighlight(collectionId, tabId);
     });
   });
 }
 
 // Setup event listeners
 function setupEventListeners() {
+  // Theme toggle
+  themeToggle.addEventListener('click', toggleTheme);
+
   // Search
   searchInput.addEventListener('input', () => {
     clearTimeout(searchTimeout);

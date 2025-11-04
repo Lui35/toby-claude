@@ -5,8 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tab Collections</title>
   <link rel="stylesheet" href="newtab.css">
+  <script>
+    // Load theme immediately to prevent flash
+    (function() {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
 </head>
-<body>
+<body class="dark-mode">
   <div class="layout">
     <!-- Main Content Area -->
     <main class="main-content">
@@ -16,6 +25,7 @@
           <h1>Tab Collections</h1>
         </div>
         <div class="header-right">
+          <button id="themeToggle" class="theme-toggle" title="Toggle dark/light mode">🌙</button>
           <button id="saveSessionBtn" class="btn btn-secondary" title="Save current session">💾 Save Session</button>
           <button id="importBtn" class="btn btn-secondary" title="Import collections">📥 Import</button>
           <button id="exportBtn" class="btn btn-secondary" title="Export collections">📤 Export</button>
