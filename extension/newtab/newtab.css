@@ -345,11 +345,29 @@ body {
   display: flex;
   align-items: center;
   gap: 14px;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  position: relative;
 }
 
 .search-result-item:hover {
   background: var(--accent-lighter);
+}
+
+.search-result-item.selected {
+  background: var(--accent-lighter);
+  border-left: 3px solid var(--accent);
+  padding-left: 17px; /* Adjust for border */
+}
+
+.search-result-item.selected::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
 }
 
 .search-result-item:last-child {

@@ -9,6 +9,10 @@ let sessions = [];
 let openTabs = [];
 let searchTimeout = null;
 
+// Search navigation state
+let searchResultsData = [];
+let selectedSearchIndex = -1;
+
 // Double shift detection
 let lastShiftTime = 0;
 const DOUBLE_SHIFT_THRESHOLD = 300; // ms
@@ -575,24 +579,37 @@ function scrollAndHighlightElements(collectionCard, tabId) {
   }
 }
 
-function handleSearch() {
+function handleSearch(autoSelectFirst = true) {
   const query = searchInput.value.trim();
 
   if (!query) {
     searchResults.classList.add('hidden');
+    searchResultsData = [];
+    selectedSearchIndex = -1;
     return;
   }
 
   const results = searchTabs(query, collections, tabItems);
+  searchResultsData = results;
 
   if (results.length === 0) {
     searchResults.innerHTML = '<div style="padding: 20px; text-align: center; color: #6b7280;">No results found</div>';
     searchResults.classList.remove('hidden');
+    selectedSearchIndex = -1;
     return;
   }
 
-  searchResults.innerHTML = results.map(result => `
-    <div class="search-result-item"
+  // Auto-select first result by default
+  selectedSearchIndex = autoSelectFirst && results.length > 0 ? 0 : -1;
+
+  renderSearchResults();
+}
+
+// Render search results with proper highlighting
+function renderSearchResults() {
+  searchResults.innerHTML = searchResultsData.map((result, index) => `
+    <div class="search-result-item ${index === selectedSearchIndex ? 'selected' : ''}"
+         data-index="${index}"
          data-url="${escapeHtml(result.url)}"
          data-collection-id="${result.collectionId}"
          data-tab-id="${result.id}">
@@ -606,23 +623,56 @@ function handleSearch() {
 
   searchResults.classList.remove('hidden');
 
+  // Scroll selected item into view
+  if (selectedSearchIndex >= 0) {
+    const selectedElement = searchResults.querySelector('.search-result-item.selected');
+    if (selectedElement) {
+      selectedElement.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }
+
+  // Add click handlers
   document.querySelectorAll('.search-result-item').forEach(el => {
     el.addEventListener('click', () => {
-      const collectionId = el.dataset.collectionId;
-      const tabId = el.dataset.tabId;
-      const url = el.dataset.url;
-
-      // Open the tab
-      chrome.runtime.sendMessage({ action: 'openTab', url: url });
-
-      // Close search
-      searchInput.value = '';
-      searchResults.classList.add('hidden');
-
-      // Scroll to and highlight the collection and tab
-      scrollToAndHighlight(collectionId, tabId);
+      openSearchResult(parseInt(el.dataset.index));
     });
   });
+}
+
+// Open a search result by index
+function openSearchResult(index) {
+  if (index < 0 || index >= searchResultsData.length) return;
+
+  const result = searchResultsData[index];
+
+  // Open the tab
+  chrome.runtime.sendMessage({ action: 'openTab', url: result.url });
+
+  // Close search
+  searchInput.value = '';
+  searchResults.classList.add('hidden');
+  searchResultsData = [];
+  selectedSearchIndex = -1;
+
+  // Scroll to and highlight the collection and tab
+  scrollToAndHighlight(result.collectionId, result.id);
+}
+
+// Navigate search results with arrow keys
+function navigateSearchResults(direction) {
+  if (searchResultsData.length === 0) return;
+
+  if (selectedSearchIndex === -1 && direction === 'down') {
+    selectedSearchIndex = 0;
+  } else if (selectedSearchIndex === -1 && direction === 'up') {
+    selectedSearchIndex = searchResultsData.length - 1;
+  } else if (direction === 'down') {
+    selectedSearchIndex = Math.min(selectedSearchIndex + 1, searchResultsData.length - 1);
+  } else if (direction === 'up') {
+    selectedSearchIndex = Math.max(selectedSearchIndex - 1, 0);
+  }
+
+  renderSearchResults();
 }
 
 // Setup event listeners
@@ -639,8 +689,9 @@ function setupEventListeners() {
   // Sidebar filter
   sidebarFilterInput.addEventListener('input', renderOpenTabs);
 
-  // Focus search with /
+  // Keyboard shortcuts and navigation
   document.addEventListener('keydown', (e) => {
+    // Focus search with /
     if (e.key === '/' && document.activeElement !== searchInput && document.activeElement !== sidebarFilterInput) {
       e.preventDefault();
       searchInput.focus();
@@ -652,14 +703,36 @@ function setupEventListeners() {
       if (now - lastShiftTime < DOUBLE_SHIFT_THRESHOLD) {
         searchInput.focus();
         searchInput.select();
+        // Trigger search with first result selected after a brief delay
+        setTimeout(() => {
+          if (searchInput.value.trim()) {
+            handleSearch(true); // Auto-select first result
+          }
+        }, 50);
       }
       lastShiftTime = now;
+    }
+
+    // Arrow key navigation in search results
+    if (document.activeElement === searchInput && searchResultsData.length > 0) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        navigateSearchResults('down');
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        navigateSearchResults('up');
+      } else if (e.key === 'Enter' && selectedSearchIndex >= 0) {
+        e.preventDefault();
+        openSearchResult(selectedSearchIndex);
+      }
     }
 
     // Escape to close search
     if (e.key === 'Escape') {
       searchInput.value = '';
       searchResults.classList.add('hidden');
+      searchResultsData = [];
+      selectedSearchIndex = -1;
       searchInput.blur();
     }
   });
