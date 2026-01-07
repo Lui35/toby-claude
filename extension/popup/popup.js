@@ -50,7 +50,7 @@ function renderCollections() {
   collectionsList.innerHTML = collections.map(collection => `
     <div class="collection-item" data-id="${collection.id}">
       <span class="collection-name">${escapeHtml(collection.name)}</span>
-      <span class="collection-count">${collection.items?.length || 0}</span>
+      <span class="collection-count">${collection.tabIds?.length || 0}</span>
     </div>
   `).join('');
 
@@ -75,6 +75,26 @@ async function addTabToCollection(collectionId) {
   renderCollections();
 }
 
+// Check if any collection already has the given URL
+async function hasCollectionWithTab(url) {
+  const { canonicalizeUrl } = await import('../utils/helpers.js');
+  const canonicalUrl = canonicalizeUrl(url);
+  const tabItems = await Storage.getTabItems();
+  
+  // Check if any collection contains a tab with this URL
+  for (const collection of collections) {
+    if (collection.tabIds && collection.tabIds.length > 0) {
+      const hasTab = collection.tabIds.some(tabId => {
+        const tab = tabItems[tabId];
+        return tab && canonicalizeUrl(tab.url) === canonicalUrl;
+      });
+      if (hasTab) return true;
+    }
+  }
+  
+  return false;
+}
+
 // Save current session
 async function saveSession() {
   const result = await chrome.runtime.sendMessage({ action: 'saveSession' });
@@ -95,7 +115,7 @@ async function createNewCollection() {
     id: generateId(),
     name: name.trim(),
     description: '',
-    items: [],
+    tabIds: [],
     createdAt: Date.now()
   };
 
@@ -103,9 +123,11 @@ async function createNewCollection() {
   await loadCollections();
   renderCollections();
 
-  // Ask if user wants to add current tab
-  if (confirm('Add current tab to this collection?')) {
-    await addTabToCollection(collection.id);
+  // Only add tab if there's already a collection with the same tab
+  if (currentTab && await hasCollectionWithTab(currentTab.url)) {
+    if (confirm('Add current tab to this collection?')) {
+      await addTabToCollection(collection.id);
+    }
   }
 }
 

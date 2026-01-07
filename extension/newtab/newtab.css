@@ -512,6 +512,20 @@ body {
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
   gap: 10px;
   transition: max-height 0.3s ease;
+  min-height: 80px;
+  position: relative;
+}
+
+.collection-body:empty::after {
+  content: 'Drag tabs here';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--text-secondary);
+  font-size: 14px;
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .collection-body.collapsed {
